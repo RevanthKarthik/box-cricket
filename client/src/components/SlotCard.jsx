@@ -30,7 +30,8 @@ export default function SlotCard({
 
       case "blocked":
         return "warning";
-
+      case "hold":
+  return "warning";
       default:
         return "secondary";
     }
@@ -85,12 +86,14 @@ export default function SlotCard({
               <h4 className="text-success fw-bold mb-1">
                 ₹{slot.price}
               </h4>
-
-              <span
-                className={`badge bg-${getStatusColor()}`}
-              >
-                {slot.status}
-              </span>
+<span
+  className={`badge bg-${getStatusColor()}`}
+>
+  {slot.status === "hold"
+    ? "Reserved"
+    : slot.status}
+</span>
+        
 
             </div>
 
@@ -110,14 +113,15 @@ export default function SlotCard({
             </button>
           ) : (
             <button
-              disabled
-              className="btn btn-secondary w-100"
-            >
-              {slot.status ===
-              "booked"
-                ? "Booked"
-                : "Unavailable"}
-            </button>
+  disabled
+  className="btn btn-secondary w-100"
+>
+  {slot.status === "booked"
+    ? "Booked"
+    : slot.status === "hold"
+    ? "Reserved"
+    : "Unavailable"}
+</button>
           )}
 
         </div>
