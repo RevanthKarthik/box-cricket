@@ -24,7 +24,7 @@ connectDB();
 app.use(
   cors({
     origin:
-      "https://rk-box-cricket.netlify.app/",
+      "https://rk-box-cricket.netlify.app",
     methods: [
       "GET",
       "POST",
