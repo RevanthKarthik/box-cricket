@@ -30,6 +30,7 @@ export default function Home() {
   };
 
   const handleBook = (slot) => {
+     setActiveCategory(null);
     setSelectedSlot(slot);
   };
 
@@ -167,6 +168,13 @@ export default function Home() {
 
     return false;
   });
+
+  console.log(
+  nightSlots.map(slot => ({
+    start: new Date(slot.startTime).toLocaleString(),
+    end: new Date(slot.endTime).toLocaleString()
+  }))
+);
   return (
     <>
       <Navbar />
