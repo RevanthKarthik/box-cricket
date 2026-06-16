@@ -5,7 +5,7 @@ import {
   getSlots,
   generateSlots,
   deleteSlot,
-  toggleSlotStatus,
+  toggleSlotStatus,holdSlot
 } from "../controllers/slotController.js";
 import adminAuth from "../middleware/adminAuth.js";
 
@@ -19,7 +19,10 @@ router.post(
   "/generate",
   generateSlots
 );
-
+router.post(
+  "/hold/:id",
+  holdSlot
+);
 router.delete(
   "/:id",
   deleteSlot
