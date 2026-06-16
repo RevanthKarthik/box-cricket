@@ -139,9 +139,11 @@ export const verifyPayment = async (
       );
 
     slot.status = "booked";
-
+    slot.holdUntil =
+  null;
     slot.bookingId =
       booking._id;
+    
 
     await slot.save();
 
