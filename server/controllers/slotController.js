@@ -38,6 +38,30 @@ const slots =
     endTime: {
       $gt: now,
     },
+
+    $or: [
+      {
+        status:
+          "available",
+      },
+      {
+        status:
+          "booked",
+      },
+      {
+        status:
+          "blocked",
+      },
+      {
+        status:
+          "hold",
+
+        holdUntil: {
+          $gt:
+            new Date(),
+        },
+      },
+    ],
   }).sort({
     startTime: 1,
   });
@@ -63,16 +87,19 @@ export const generateSlots =
               "Date required",
           });
       }
+const [year, month, day] =
+  date.split("-");
 
-      const startDay =
-        new Date(date);
-
-      startDay.setHours(
-        6,
-        0,
-        0,
-        0
-      );
+const startDay =
+  new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    6,
+    0,
+    0,
+    0
+  );
 
       const slots = [];
 
@@ -209,5 +236,57 @@ export const toggleSlotStatus =
       res.status(500).json({
         message: error.message,
       });
+    }
+  };
+  export const holdSlot =
+  async (req, res) => {
+    try {
+
+      const slot =
+        await Slot.findById(
+          req.params.id
+        );
+
+      if (!slot) {
+        return res.status(404)
+          .json({
+            message:
+              "Slot not found",
+          });
+      }
+
+      if (
+        slot.status !==
+        "available"
+      ) {
+        return res.status(400)
+          .json({
+            message:
+              "Slot unavailable",
+          });
+      }
+
+      slot.status =
+        "hold";
+
+      slot.holdUntil =
+        new Date(
+          Date.now() +
+          10 * 60 * 1000
+        );
+
+      await slot.save();
+
+      res.json({
+        success: true,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message,
+      });
+
     }
   };
