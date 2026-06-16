@@ -1,241 +1,133 @@
-import { useState } from "react";
-import api from "../services/api";
-
-export default function BookingModal({
+export default function SlotCard({
   slot,
-  onClose,
+  onBook,
 }) {
-  const [name, setName] =
-    useState("");
+  const startTime =
+    new Date(
+      slot.startTime
+    ).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  const [phone, setPhone] =
-    useState("");
+  const endTime =
+    new Date(
+      slot.endTime
+    ).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  const [loading, setLoading] =
-    useState(false);
+  const getStatusColor = () => {
+    switch (
+      slot.status
+    ) {
+      case "available":
+        return "success";
 
-  const handleSubmit = async (
-    e
-  ) => {
-    e.preventDefault();
+      case "booked":
+        return "danger";
 
-    try {
-      setLoading(true);
-
-      // Create Booking
-
-      const bookingRes =
-        await api.post(
-          "/bookings",
-          {
-            name,
-            phone,
-            slotId: slot._id,
-          }
-        );
-
-      const booking =
-        bookingRes.data;
-
-      // Create Razorpay Order
-
-      const orderRes =
-        await api.post(
-          "/payments/create-order",
-          {
-            bookingId:
-              booking._id,
-          }
-        );
-      console.log("ORDER RESPONSE", orderRes.data);
-console.log("RAZORPAY", window.Razorpay);
-      const order =
-        orderRes.data;
-      const options = {
-        key:
-          import.meta.env
-            .VITE_RAZORPAY_KEY_ID,
-
-        amount:
-          order.amount,
-
-        currency:
-          order.currency,
-
-        name:
-          "RK Box Cricket",
-
-        description:
-          "Slot Booking",
-
-        order_id:
-          order.id,
-
-        handler:
-          async function (
-            response
-          ) {
-            try {
-              await api.post(
-                "/payments/verify",
-                {
-                  razorpay_order_id:
-                    response.razorpay_order_id,
-
-                  razorpay_payment_id:
-                    response.razorpay_payment_id,
-
-                  razorpay_signature:
-                    response.razorpay_signature,
-                }
-              );
-
-              alert(
-                "Payment Successful!"
-              );
-
-              onClose();
-
-              window.location.reload();
-            } catch (error) {
-              alert(
-                "Payment Verification Failed"
-              );
-            }
-          },
-
-        prefill: {
-          name,
-          contact:
-            phone,
-        },
-
-        theme: {
-          color:
-            "#198754",
-        },
-      };
-
-      const razorpay =
-        
-      new window.Razorpay(
-          options
-        );
-
-      razorpay.open();
-    } catch (error) {
-      console.log(error);
-
-      alert(
-        error.response?.data
-          ?.message ||
-          "Booking Failed"
-      );
-    } finally {
-      setLoading(false);
+      case "blocked":
+        return "warning";
+      case "hold":
+  return "warning";
+      default:
+        return "secondary";
     }
   };
 
   return (
-    <div
-  className="modal fade show"
-  style={{
-    display: "block",
-    background:
-      "rgba(0,0,0,0.5)",
-    zIndex: 11000,
-  }}
+    <div className="col-lg-6 mb-3">
 
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
+      <div
+        className="card border-0 shadow-sm"
+        style={{
+          borderRadius: "18px",
+        }}
+      >
 
-          <div className="modal-header">
+        <div className="card-body">
 
-            <h5>
-              Book Slot
-            </h5>
+          <div className="d-flex justify-content-between align-items-center">
+<div>
 
-            <button
-              className="btn-close"
-              onClick={onClose}
-            />
+  <h5 className="fw-bold mb-1">
+    {startTime}
+  </h5>
+
+  <small className="text-muted d-block">
+    to {endTime}
+  </small>
+
+  <small
+    className="text-secondary"
+    style={{
+      fontSize: "0.72rem",
+      fontWeight: "600",
+    }}
+  >
+    {new Date(
+      slot.startTime
+    ).toLocaleDateString(
+      "en-IN",
+      {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }
+    )}
+  </small>
+
+</div>
+
+            <div className="text-end">
+
+              <h4 className="text-success fw-bold mb-1">
+                ₹{slot.price}
+              </h4>
+<span
+  className={`badge bg-${getStatusColor()}`}
+>
+  {slot.status === "hold"
+    ? "Reserved"
+    : slot.status}
+</span>
+        
+
+            </div>
 
           </div>
 
-          <div className="modal-body">
+          <hr />
 
-            <p>
-              Price:
-              <strong>
-                ₹{slot.price}
-              </strong>
-            </p>
-
-            <form
-              onSubmit={
-                handleSubmit
+          {slot.status ===
+          "available" ? (
+            <button
+              className="btn btn-success w-100"
+              onClick={() =>
+                onBook(slot)
               }
             >
-              <div className="mb-3">
-
-                <label>
-                  Name
-                </label>
-
-                <input
-                  className="form-control"
-                  value={name}
-                  onChange={(e) =>
-                    setName(
-                      e.target.value
-                    )
-                  }
-                  required
-                />
-
-              </div>
-
-              <div className="mb-3">
-
-                <label>
-                  Mobile
-                </label>
-
-                <input
-  type="tel"
-  className="form-control"
-  value={phone}
-  maxLength={10}
-  pattern="[6-9]{1}[0-9]{9}"
-  onChange={(e) =>
-    setPhone(
-      e.target.value
-        .replace(/\D/g, "")
-    )
-  }
-  required
-/>
-
-              </div>
-
-              <button
-                className="btn btn-success w-100"
-                disabled={
-                  loading
-                }
-              >
-                {loading
-                  ? "Processing..."
-                  : "Pay Now"}
-              </button>
-
-            </form>
-
-          </div>
+              Book Now
+            </button>
+          ) : (
+            <button
+  disabled
+  className="btn btn-secondary w-100"
+>
+  {slot.status === "booked"
+    ? "Booked"
+    : slot.status === "hold"
+    ? "Reserved"
+    : "Unavailable"}
+</button>
+          )}
 
         </div>
+
       </div>
+
     </div>
   );
 }
