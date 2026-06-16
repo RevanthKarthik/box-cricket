@@ -203,15 +203,19 @@ console.log("RAZORPAY", window.Razorpay);
                 </label>
 
                 <input
-                  className="form-control"
-                  value={phone}
-                  onChange={(e) =>
-                    setPhone(
-                      e.target.value
-                    )
-                  }
-                  required
-                />
+  type="tel"
+  className="form-control"
+  value={phone}
+  maxLength={10}
+  pattern="[6-9]{1}[0-9]{9}"
+  onChange={(e) =>
+    setPhone(
+      e.target.value
+        .replace(/\D/g, "")
+    )
+  }
+  required
+/>
 
               </div>
 
