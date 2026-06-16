@@ -1,0 +1,282 @@
+/* ==========================================================================
+   PREMIUM COMPACT MOBILE-FIRST DESIGN FOR RK BOX CRICKET
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #fafbfa;
+  color: #1e293b;
+  overflow-x: hidden; /* Global escape layout shield for clean mobile view */
+}
+
+section {
+  padding-top: 50px !important;
+  padding-bottom: 50px !important;
+}
+
+/* --- Hero Section Fixes --- */
+section.text-white.text-center.d-flex.align-items-center {
+  min-height: 65vh !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 -120px 100px rgba(0, 0, 0, 0.75);
+}
+
+section.text-white.text-center.d-flex.align-items-center h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, #ffffff 40%, #a7f3d0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 25px rgba(22, 163, 74, 0.3);
+}
+
+/* --- Premium Utility Buttons Framework --- */
+.btn-success {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%) !important;
+  border: none !important;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 10px 24px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.45) !important;
+}
+
+.btn-outline-success {
+  border: 2px solid #22c55e !important;
+  color: #16a34a !important;
+  font-weight: 600;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-outline-success:hover {
+  background: #22c55e !important;
+  color: white !important;
+}
+
+/* --- Dynamic Pricing Section Polish --- */
+#pricing .card {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 16px !important;
+  background: #ffffff;
+  transition: all 0.4s ease;
+}
+
+#pricing .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+#pricing .card-body {
+  padding: 1.5rem !important; /* Fixed padding to make text legible */
+}
+
+#pricing .border-success {
+  border: 2px solid #22c55e !important;
+  position: relative;
+}
+
+#pricing .border-success::before {
+  content: 'POPULAR';
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #22c55e;
+  color: white;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+#pricing h2.text-success {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 8px 0;
+}
+
+/* --- Filter Dropdowns & Control --- */
+#slots .form-select-lg {
+  border-radius: 14px;
+  border: 2px solid #e2e8f0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  padding: 10px 16px;
+  transition: all 0.25s ease;
+}
+
+#slots .form-select-lg:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+#slots .btn-group {
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+#slots .btn-group .btn {
+  border-radius: 9px !important;
+  font-weight: 600;
+  border: none !important;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+}
+
+/* --- Interactive Slot Cards --- */
+.slot-category-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px !important;
+}
+
+.slot-category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15) !important;
+}
+
+.slot-category-card h2 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  animation: subtleFloat 3s ease-in-out infinite;
+}
+
+.slot-category-card h4 {
+  font-size: 1.35rem;
+}
+
+.slot-category-card .btn-light {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* --- Dashboard Style History Cards --- */
+.my-bookings-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 20px;
+  padding: 30px 24px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+/* --- Contact & Location Setup --- */
+#contact .card-body {
+  padding: 2rem !important;
+}
+
+#contact h6.text-success {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+#contact p {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+#contact .btn-success, #contact .btn-outline-success {
+  min-height: 48px;
+  display: flex; /* Fixed invalid property value */
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* --- Animations --- */
+@keyframes subtleFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ==========================================================================
+   MOBILE PRIORITY SCREEN OPTIMIZATIONS (Max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  section {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+
+  h2 {
+    font-size: 1.75rem !important;
+    margin-bottom: 30px !important;
+  }
+
+  section.text-white.text-center.d-flex.align-items-center {
+    min-height: 55vh !important;
+  }
+
+  /* Named Mobile Horizontal Tray Scroller Rules */
+  .complex-mobile-scroller {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 15px !important;
+    padding-left: 10px !important;
+    scrollbar-width: none; 
+  }
+
+  .complex-mobile-scroller::-webkit-scrollbar {
+    display: none; 
+  }
+
+  .complex-mobile-scroller .scroller-item {
+    flex: 0 0 82% !important;
+    max-width: 82% !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .card-body {
+    padding: 1.25rem !important;
+  }
+
+  #pricing h2.text-success {
+    font-size: 1.9rem;
+  }
+
+  #contact iframe {
+    height: 280px !important;
+  }
+
+  footer.py-4 {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+  }
+}
+
+footer.bg-dark {
+  background-color: #0f172a !important; 
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
