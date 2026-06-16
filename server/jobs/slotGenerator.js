@@ -127,6 +127,31 @@ export const startSlotGenerator =
       }
     );
 
+    cron.schedule(
+  "* * * * *",
+  async () => {
+
+    await Slot.updateMany(
+      {
+        status: "hold",
+
+        holdUntil: {
+          $lt:
+            new Date(),
+        },
+      },
+      {
+        status:
+          "available",
+
+        holdUntil:
+          null,
+      }
+    );
+
+  }
+);
+
     console.log(
       "Slot Generator Started"
     );
