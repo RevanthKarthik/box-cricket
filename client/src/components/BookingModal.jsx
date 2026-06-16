@@ -1,133 +1,287 @@
-export default function SlotCard({
+import { useState } from "react";
+import api from "../services/api";
+
+export default function BookingModal({
   slot,
-  onBook,
+  onClose,
 }) {
-  const startTime =
-    new Date(
-      slot.startTime
-    ).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const [name, setName] =
+    useState("");
 
-  const endTime =
-    new Date(
-      slot.endTime
-    ).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const [phone, setPhone] =
+    useState("");
 
-  const getStatusColor = () => {
-    switch (
-      slot.status
-    ) {
-      case "available":
-        return "success";
+  const [loading, setLoading] =
+    useState(false);
 
-      case "booked":
-        return "danger";
+  const handleSubmit = async (
+    e
+  ) => {
+    e.preventDefault();
 
-      case "blocked":
-        return "warning";
-      case "hold":
-  return "warning";
-      default:
-        return "secondary";
+    try {
+      setLoading(true);
+
+      // Create Booking
+      await api.post(
+  `/slots/hold/${slot._id}`
+);
+      const bookingRes =
+        await api.post(
+          "/bookings",
+          {
+            name,
+            phone,
+            slotId: slot._id,
+          }
+        );
+
+      const booking =
+        bookingRes.data;
+
+      // Create Razorpay Order
+
+      const orderRes =
+        await api.post(
+          "/payments/create-order",
+          {
+            bookingId:
+              booking._id,
+          }
+        );
+      console.log("ORDER RESPONSE", orderRes.data);
+console.log("RAZORPAY", window.Razorpay);
+      const order =
+        orderRes.data;
+      const options = {
+        key:
+          import.meta.env
+            .VITE_RAZORPAY_KEY_ID,
+
+        amount:
+          order.amount,
+
+        currency:
+          order.currency,
+
+        name:
+          "RK Box Cricket",
+
+        description:
+          "Slot Booking",
+
+        order_id:
+          order.id,
+
+        handler:
+          async function (
+            response
+          ) {
+            try {
+              await api.post(
+                "/payments/verify",
+                {
+                  razorpay_order_id:
+                    response.razorpay_order_id,
+
+                  razorpay_payment_id:
+                    response.razorpay_payment_id,
+
+                  razorpay_signature:
+                    response.razorpay_signature,
+                }
+              );
+
+              alert(
+                "Payment Successful!"
+              );
+
+              onClose();
+
+              window.location.reload();
+            } catch (error) {
+              alert(
+                "Payment Verification Failed"
+              );
+            }
+          },
+
+        prefill: {
+          name,
+          contact:
+            phone,
+        },
+
+        theme: {
+          color:
+            "#198754",
+        },
+      };
+
+      const razorpay =
+        
+      new window.Razorpay(
+          options
+        );
+
+      razorpay.open();
+    } catch (error) {
+      console.log(error);
+
+      alert(
+        error.response?.data
+          ?.message ||
+          "Booking Failed"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="col-lg-6 mb-3">
+    <div
+  className="modal fade show"
+  style={{
+    display: "block",
+    background:
+      "rgba(0,0,0,0.5)",
+    zIndex: 11000,
+  }}
 
-      <div
-        className="card border-0 shadow-sm"
-        style={{
-          borderRadius: "18px",
-        }}
-      >
+    >
+      <div className="modal-dialog">
+        <div className="modal-content">
 
-        <div className="card-body">
+          <div className="modal-header">
 
-          <div className="d-flex justify-content-between align-items-center">
-<div>
+            <h5>
+              Book Slot
+            </h5>
 
-  <h5 className="fw-bold mb-1">
-    {startTime}
-  </h5>
+            <button
+              className="btn-close"
+              onClick={onClose}
+            />
 
-  <small className="text-muted d-block">
-    to {endTime}
-  </small>
+          </div>
 
-  <small
-    className="text-secondary"
-    style={{
-      fontSize: "0.72rem",
-      fontWeight: "600",
-    }}
-  >
+          <div className="modal-body">
+
+          <div
+  className="alert alert-success"
+  style={{
+    borderRadius: "12px",
+  }}
+>
+  <h6 className="fw-bold mb-2">
+    Selected Slot
+  </h6>
+
+  <p className="mb-1">
+    📅{" "}
     {new Date(
       slot.startTime
     ).toLocaleDateString(
       "en-IN",
       {
-        weekday: "short",
+        weekday: "long",
         day: "numeric",
-        month: "short",
+        month: "long",
       }
     )}
-  </small>
+  </p>
 
+  <p className="mb-1">
+    🕒{" "}
+    {new Date(
+      slot.startTime
+    ).toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    )}
+    {" - "}
+    {new Date(
+      slot.endTime
+    ).toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    )}
+  </p>
+
+  <p className="mb-0">
+    💰 Price:
+    <strong>
+      {" "}₹{slot.price}
+    </strong>
+  </p>
 </div>
 
-            <div className="text-end">
+            <form
+              onSubmit={
+                handleSubmit
+              }
+            >
+              <div className="mb-3">
 
-              <h4 className="text-success fw-bold mb-1">
-                ₹{slot.price}
-              </h4>
-<span
-  className={`badge bg-${getStatusColor()}`}
->
-  {slot.status === "hold"
-    ? "Reserved"
-    : slot.status}
-</span>
-        
+                <label>
+                  Name
+                </label>
 
-            </div>
+                <input
+                  className="form-control"
+                  value={name}
+                  onChange={(e) =>
+                    setName(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+              </div>
+
+              <div className="mb-3">
+
+                <label>
+                  Mobile
+                </label>
+
+                <input
+                  className="form-control"
+                  value={phone}
+                  onChange={(e) =>
+                    setPhone(
+                      e.target.value
+                    )
+                  }
+                  required
+                />
+
+              </div>
+
+              <button
+                className="btn btn-success w-100"
+                disabled={
+                  loading
+                }
+              >
+                {loading
+                  ? "Processing..."
+                  : "Pay Now"}
+              </button>
+
+            </form>
 
           </div>
 
-          <hr />
-
-          {slot.status ===
-          "available" ? (
-            <button
-              className="btn btn-success w-100"
-              onClick={() =>
-                onBook(slot)
-              }
-            >
-              Book Now
-            </button>
-          ) : (
-            <button
-  disabled
-  className="btn btn-secondary w-100"
->
-  {slot.status === "booked"
-    ? "Booked"
-    : slot.status === "hold"
-    ? "Reserved"
-    : "Unavailable"}
-</button>
-          )}
-
         </div>
-
       </div>
-
     </div>
   );
 }
