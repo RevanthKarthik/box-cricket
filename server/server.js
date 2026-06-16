@@ -24,7 +24,7 @@ connectDB();
 app.use(
   cors({
     origin:
-      "http://localhost:5173",
+      "rk-box-cricket.netlify.app",
     methods: [
       "GET",
       "POST",
