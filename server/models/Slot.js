@@ -6,7 +6,10 @@ const slotSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-
+    holdUntil: {
+  type: Date,
+  default: null,
+},
     endTime: {
       type: Date,
       required: true,
@@ -19,7 +22,7 @@ const slotSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["available", "booked", "blocked"],
+      enum: ["available","hold", "booked", "blocked"],
       default: "available",
     },
 
