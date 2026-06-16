@@ -8,15 +8,19 @@ export const generateSlotsForDate =
 
     const slots = [];
 
-    const startDay =
-      new Date(date);
+    const [year, month, day] =
+  date.split("-");
 
-    startDay.setHours(
-      6,
-      0,
-      0,
-      0
-    );
+const startDay =
+  new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    6,
+    0,
+    0,
+    0
+  );
 
     for (
       let i = 0;
