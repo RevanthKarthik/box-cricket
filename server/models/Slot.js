@@ -35,6 +35,9 @@ const slotSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-slotSchema.index({ startTime: 1 });
+slotSchema.index(
+  { startTime: 1 },
+  { unique: true }
+);
 
 export default mongoose.model("Slot", slotSchema);
