@@ -6,43 +6,56 @@ export const generateSlotsForDate = async (date) => {
 
   const [year, month, day] = date.split("-");
 
-  // Base day configuration (Hardcoding 6:00:00.000 AM)
+  // 6:00 AM IST = 00:30 UTC
   const startDay = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    6,  // Start Hour
-    0,  // Minutes
-    0,  // Seconds
-    0   // Milliseconds
+    Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      0,
+      30,
+      0,
+      0
+    )
   );
 
   for (let i = 0; i < 24; i++) {
     const startTime = new Date(startDay);
 
-    // FIX: Force the hour calculation AND lock minutes/seconds/ms to exactly 0
-    startTime.setHours(startDay.getHours() + i, 0, 0, 0);
+    startTime.setUTCHours(
+      startDay.getUTCHours() + i
+    );
 
     const endTime = new Date(startTime);
-    // FIX: Force end time minutes/seconds/ms to exactly 0 as well
-    endTime.setHours(startTime.getHours() + 1, 0, 0, 0);
 
-    // Don't recreate expired slots
-    if (endTime <= now) {
-      continue;
-    }
+    endTime.setUTCHours(
+      startTime.getUTCHours() + 1
+    );
 
-    // Check if this precise slot already exists in MongoDB
-    const exists = await Slot.findOne({ startTime });
-    if (exists) {
-      continue;
-    }
+    if (endTime <= now) continue;
 
-    const hour = startTime.getHours();
+    const exists = await Slot.findOne({
+      startTime,
+    });
+
+    if (exists) continue;
+
+    const istHour =
+      new Date(startTime).toLocaleString(
+        "en-IN",
+        {
+          timeZone: "Asia/Kolkata",
+          hour: "numeric",
+          hour12: false,
+        }
+      );
+
     let price = 500;
 
-    // Peak hours pricing logic (5 PM to 10 PM)
-    if (hour >= 17 && hour < 22) {
+    if (
+      Number(istHour) >= 17 &&
+      Number(istHour) < 22
+    ) {
       price = 700;
     }
 
@@ -53,9 +66,11 @@ export const generateSlotsForDate = async (date) => {
     });
   }
 
-  // Batch insert to optimize database calls
   if (slots.length > 0) {
     await Slot.insertMany(slots);
-    console.log(`${slots.length} slots successfully created for ${date}`);
+
+    console.log(
+      `${slots.length} slots created for ${date}`
+    );
   }
 };
