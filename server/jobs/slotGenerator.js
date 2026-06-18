@@ -1,7 +1,5 @@
 import cron from "node-cron";
-
 import Slot from "../models/Slot.js";
-
 import {
   generateSlotsForDate,
 } from "../utils/generateSlotsForDate.js";
@@ -9,80 +7,29 @@ import {
 export const startSlotGenerator =
   async () => {
 
-    const now =
-      new Date();
-
-    const today =
-      `${now.getFullYear()}-${
-        String(
-          now.getMonth() + 1
-        ).padStart(2, "0")
-      }-${
-        String(
-          now.getDate()
-        ).padStart(2, "0")
-      }`;
-
-    const tomorrow =
-      new Date(now);
-
-    tomorrow.setDate(
-      tomorrow.getDate() + 1
-    );
-
-    const tomorrowDate =
-      `${tomorrow.getFullYear()}-${
-        String(
-          tomorrow.getMonth() + 1
-        ).padStart(2, "0")
-      }-${
-        String(
-          tomorrow.getDate()
-        ).padStart(2, "0")
-      }`;
-
-    // Startup Recovery
-
-    await generateSlotsForDate(
-      today
-    );
-
-    await generateSlotsForDate(
-      tomorrowDate
-    );
-
-    // Generate Tomorrow Slots Daily
+    // Generate Tomorrow Slots Daily at 5 PM IST
 
     cron.schedule(
       "0 17 * * *",
       async () => {
-
         try {
 
           const tomorrow =
             new Date();
 
           tomorrow.setDate(
-            tomorrow.getDate() +
-              1
+            tomorrow.getDate() + 1
           );
 
           const tomorrowDate =
             `${tomorrow.getFullYear()}-${
               String(
-                tomorrow.getMonth() +
-                  1
-              ).padStart(
-                2,
-                "0"
-              )
+                tomorrow.getMonth() + 1
+              ).padStart(2, "0")
             }-${
               String(
                 tomorrow.getDate()
-              ).padStart(
-                2,
-                "0"
-              )
+              ).padStart(2, "0")
             }`;
 
           await generateSlotsForDate(
@@ -90,13 +37,12 @@ export const startSlotGenerator =
           );
 
           console.log(
-            "Tomorrow slots generated"
+            `Tomorrow slots generated for ${tomorrowDate}`
           );
 
         } catch (error) {
           console.log(error);
         }
-
       }
     );
 
@@ -105,7 +51,6 @@ export const startSlotGenerator =
     cron.schedule(
       "5 0 * * *",
       async () => {
-
         try {
 
           const result =
@@ -123,34 +68,39 @@ export const startSlotGenerator =
         } catch (error) {
           console.log(error);
         }
-
       }
     );
+
+    // Release Expired Reservations Every Minute
 
     cron.schedule(
-  "* * * * *",
-  async () => {
+      "* * * * *",
+      async () => {
 
-    await Slot.updateMany(
-      {
-        status: "hold",
+        try {
 
-        holdUntil: {
-          $lt:
-            new Date(),
-        },
-      },
-      {
-        status:
-          "available",
+          await Slot.updateMany(
+            {
+              status: "hold",
+              holdUntil: {
+                $lt:
+                  new Date(),
+              },
+            },
+            {
+              status:
+                "available",
+              holdUntil:
+                null,
+            }
+          );
 
-        holdUntil:
-          null,
+        } catch (error) {
+          console.log(error);
+        }
+
       }
     );
-
-  }
-);
 
     console.log(
       "Slot Generator Started"
