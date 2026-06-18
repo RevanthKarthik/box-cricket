@@ -3,20 +3,30 @@ export default function SlotCard({
   onBook,
 }) {
   const startTime =
-    new Date(
-      slot.startTime
-    ).toLocaleTimeString([], {
+  new Date(
+    slot.startTime
+  ).toLocaleTimeString(
+    "en-IN",
+    {
+      timeZone:
+        "Asia/Kolkata",
       hour: "2-digit",
       minute: "2-digit",
-    });
+    }
+  );
 
-  const endTime =
-    new Date(
-      slot.endTime
-    ).toLocaleTimeString([], {
+const endTime =
+  new Date(
+    slot.endTime
+  ).toLocaleTimeString(
+    "en-IN",
+    {
+      timeZone:
+        "Asia/Kolkata",
       hour: "2-digit",
       minute: "2-digit",
-    });
+    }
+  );
 
   const getStatusColor = () => {
     switch (
