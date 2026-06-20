@@ -8,13 +8,11 @@ export const startSlotGenerator =
   async () => {
 
     // =========================
-    // INITIAL RECOVERY
+    // ENSURE TODAY & TOMORROW SLOTS EXIST
+    // (Runs whenever backend starts)
     // =========================
 
-    const slotCount =
-      await Slot.countDocuments();
-
-    if (slotCount === 0) {
+    try {
 
       const now =
         new Date();
@@ -30,147 +28,81 @@ export const startSlotGenerator =
           ).padStart(2, "0")
         }`;
 
-      await generateSlotsForDate(
-        today
+      const tomorrow =
+        new Date(now);
+
+      tomorrow.setDate(
+        tomorrow.getDate() + 1
       );
 
+      const tomorrowDate =
+        `${tomorrow.getFullYear()}-${
+          String(
+            tomorrow.getMonth() + 1
+          ).padStart(2, "0")
+        }-${
+          String(
+            tomorrow.getDate()
+          ).padStart(2, "0")
+        }`;
+
+      const todayExists =
+        await Slot.findOne({
+          startTime: {
+            $gte: new Date(
+              `${today}T00:00:00.000Z`
+            ),
+            $lt: new Date(
+              `${today}T23:59:59.999Z`
+            ),
+          },
+        });
+
+      if (!todayExists) {
+
+        await generateSlotsForDate(
+          today
+        );
+
+        console.log(
+          `Today's slots created (${today})`
+        );
+      }
+
+      const tomorrowExists =
+        await Slot.findOne({
+          startTime: {
+            $gte: new Date(
+              `${tomorrowDate}T00:00:00.000Z`
+            ),
+            $lt: new Date(
+              `${tomorrowDate}T23:59:59.999Z`
+            ),
+          },
+        });
+
+      if (!tomorrowExists) {
+
+        await generateSlotsForDate(
+          tomorrowDate
+        );
+
+        console.log(
+          `Tomorrow's slots created (${tomorrowDate})`
+        );
+      }
+
+    } catch (error) {
+
       console.log(
-        `Initial slots created for ${today}`
+        "Startup slot generation error:",
+        error
       );
+
     }
 
     // =========================
-    // 5 AM RECOVERY
-    // =========================
-
-    cron.schedule(
-      "0 5 * * *",
-      async () => {
-
-        try {
-
-          const now =
-            new Date();
-
-          const today =
-            `${now.getFullYear()}-${
-              String(
-                now.getMonth() + 1
-              ).padStart(2, "0")
-            }-${
-              String(
-                now.getDate()
-              ).padStart(2, "0")
-            }`;
-
-          const exists =
-            await Slot.exists({
-              startTime: {
-                $gte: new Date(
-                  `${today}T00:00:00.000Z`
-                ),
-              },
-            });
-
-          if (!exists) {
-
-            await generateSlotsForDate(
-              today
-            );
-
-            console.log(
-              `Recovery generated slots for ${today}`
-            );
-          }
-
-        } catch (error) {
-          console.log(error);
-        }
-
-      },
-      {
-        timezone:
-          "Asia/Kolkata",
-      }
-    );
-
-    // =========================
-    // 5 PM GENERATE TOMORROW
-    // =========================
-
-    cron.schedule(
-      "0 17 * * *",
-      async () => {
-
-        try {
-
-          const tomorrow =
-            new Date();
-
-          tomorrow.setDate(
-            tomorrow.getDate() + 1
-          );
-
-          const tomorrowDate =
-            `${tomorrow.getFullYear()}-${
-              String(
-                tomorrow.getMonth() + 1
-              ).padStart(2, "0")
-            }-${
-              String(
-                tomorrow.getDate()
-              ).padStart(2, "0")
-            }`;
-
-          const beforeCount =
-            await Slot.countDocuments();
-
-          await generateSlotsForDate(
-            tomorrowDate
-          );
-
-          const afterCount =
-            await Slot.countDocuments();
-
-          console.log(`
-====================================
-TOMORROW SLOT GENERATION
-====================================
-Time (IST):
-${new Date().toLocaleString(
-  "en-IN",
-  {
-    timeZone:
-      "Asia/Kolkata",
-  }
-)}
-Date Generated:
-${tomorrowDate}
-
-Slots Before:
-${beforeCount}
-
-Slots After:
-${afterCount}
-
-New Slots Added:
-${afterCount - beforeCount}
-====================================
-`);
-
-        } catch (error) {
-          console.log(error);
-        }
-
-      },
-      {
-        timezone:
-          "Asia/Kolkata",
-      }
-    );
-
-    // =========================
-    // DELETE EXPIRED SLOTS
+    // DELETE EXPIRED SLOTS DAILY
     // =========================
 
     cron.schedule(
@@ -192,7 +124,9 @@ ${afterCount - beforeCount}
           );
 
         } catch (error) {
+
           console.log(error);
+
         }
 
       },
@@ -203,7 +137,7 @@ ${afterCount - beforeCount}
     );
 
     // =========================
-    // RELEASE HELD SLOTS
+    // RELEASE EXPIRED HOLDS
     // =========================
 
     cron.schedule(
@@ -238,31 +172,21 @@ ${afterCount - beforeCount}
           ) {
 
             console.log(
-              `${result.modifiedCount} held slots released`
+              `${result.modifiedCount} hold slot(s) released`
             );
 
           }
 
         } catch (error) {
+
           console.log(error);
+
         }
 
       }
     );
 
-    console.log(`
-====================================
-RK BOX CRICKET
-SLOT GENERATOR STARTED
-====================================
-Time (IST):
-${new Date().toLocaleString(
-      "en-IN",
-      {
-        timeZone:
-          "Asia/Kolkata",
-      }
-    )}
-====================================
-`);
+    console.log(
+      "RK Box Cricket Slot Generator Started"
+    );
   };
