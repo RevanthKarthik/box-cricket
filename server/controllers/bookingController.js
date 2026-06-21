@@ -7,73 +7,95 @@ export const createBooking = async (
   res
 ) => {
   try {
-    const { name, phone, slotId } =
-      req.body;
 
-    const slot = await Slot.findById(
-      slotId
-    );
+    const {
+      name,
+      phone,
+      slotId,
+    } = req.body;
+
+    const slot =
+      await Slot.findById(
+        slotId
+      );
 
     if (!slot) {
       return res.status(404).json({
-        message: "Slot not found",
+        message:
+          "Slot not found",
       });
     }
 
-    if (slot.status !== "available") {
+    if (
+      slot.status !==
+      "available"
+    ) {
       return res.status(400).json({
         message:
           "Slot not available",
       });
     }
 
-    let user = await User.findOne({
-      phone,
-    });
-
-    if (!user) {
-      user = await User.create({
-        name,
+    let user =
+      await User.findOne({
         phone,
       });
+
+    if (!user) {
+      user =
+        await User.create({
+          name,
+          phone,
+        });
     }
 
     const booking =
-  await Booking.create({
-    user: user._id,
+      await Booking.create({
+        user: user._id,
+        slot: slot._id,
+        name,
+        phone,
+        startTime:
+          slot.startTime,
+        endTime:
+          slot.endTime,
+        price:
+          slot.price,
+        amount:
+          slot.price,
+        paymentStatus:
+          "pending",
+        bookingStatus:
+          "pending",
+      });
 
-    slot: slot._id,
+    // HOLD SLOT FOR 10 MINUTES
 
-    name,
+    slot.status =
+      "hold";
 
-    phone,
+    slot.holdUntil =
+      new Date(
+        Date.now() +
+          10 * 60 * 1000
+      );
 
-    startTime:
-      slot.startTime,
+    slot.bookingId =
+      booking._id;
 
-    endTime:
-      slot.endTime,
-
-    price:
-      slot.price,
-
-    amount:
-      slot.price,
-
-    paymentStatus:
-      "pending",
-
-    bookingStatus:
-      "pending",
-  });
+    await slot.save();
 
     res.status(201).json(
       booking
     );
+
   } catch (error) {
+
     res.status(500).json({
-      message: error.message,
+      message:
+        error.message,
     });
+
   }
 };
 export const getAllBookings =
