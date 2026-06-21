@@ -23,9 +23,7 @@ export default function BookingModal({
       setLoading(true);
 
       // Create Booking
-      await api.post(
-  `/slots/hold/${slot._id}`
-);
+  
       const bookingRes =
         await api.post(
           "/bookings",
